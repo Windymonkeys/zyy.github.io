@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>显示1s自动隐藏的动画效果 | 花果山</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#1 需求描述 搜索结果页面,在搜索结果页面的顶部提醒用户搜索到多少条相关的东西，展示一秒或者几秒钟之后，设置动画效果隐藏改提示； #2 解决方案 Textview实现该需求，因为只需要一段文字提醒用户； #3 具体的思路 ###3.1 在页面的顶部添加一个Textview, 先设置 GONE；###3.2 页面请求接口成功并有对应的结果数据返回后显示提醒的TextView；###3.3 Text">
+<meta property="og:type" content="article">
+<meta property="og:title" content="显示1s自动隐藏的动画效果">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.windymonkey.cn&#x2F;2019&#x2F;11&#x2F;29&#x2F;%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C&#x2F;index.html">
+<meta property="og:site_name" content="花果山">
+<meta property="og:description" content="#1 需求描述 搜索结果页面,在搜索结果页面的顶部提醒用户搜索到多少条相关的东西，展示一秒或者几秒钟之后，设置动画效果隐藏改提示； #2 解决方案 Textview实现该需求，因为只需要一段文字提醒用户； #3 具体的思路 ###3.1 在页面的顶部添加一个Textview, 先设置 GONE；###3.2 页面请求接口成功并有对应的结果数据返回后显示提醒的TextView；###3.3 Text">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-29T15:18:32.178Z">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="花果山" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">花果山</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.windymonkey.cn"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-显示1s自动隐藏的动画效果" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/29/%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C/" class="article-date">
+  <time datetime="2019-11-29T15:02:03.051Z" itemprop="datePublished">2019-11-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      显示1s自动隐藏的动画效果
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#1 需求描述</p>
+<p>搜索结果页面,在搜索结果页面的顶部提醒用户搜索到多少条相关的东西，展示一秒或者几秒钟之后，设置动画效果隐藏改提示；</p>
+<p>#2 解决方案</p>
+<p>Textview实现该需求，因为只需要一段文字提醒用户；</p>
+<p>#3 具体的思路</p>
+<p>###3.1 在页面的顶部添加一个Textview, 先设置 GONE；<br>###3.2 页面请求接口成功并有对应的结果数据返回后显示提醒的TextView；<br>###3.3 Textview显示之后，执行动画效果，这里使用的是Handler；</p>
+<p>#4 代码模块<br>####4.1 Handler模块；<br>初始化Handler</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">private Handler mHandler &#x3D; new Handler() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">     @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">     public void handleMessage(Message msg) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">         switch (msg.what) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">             case FADE_OUT:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">                 animateClose(tvTips);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">                 break;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">         &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"> &#125;;</span></pre></td></tr></table></figure>
+<p>####4.2动画效果代码模块；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">private void animateClose(final TextView view) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">       int origHeight &#x3D; view.getHeight();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">       ValueAnimator animator &#x3D; createDropAnimator(view, origHeight, 0);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">       animator.addListener(new AnimatorListenerAdapter() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">           @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">           public void onAnimationEnd(Animator animation) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">               view.setVisibility(View.GONE);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">           &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">       &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">       animator.start();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">   private ValueAnimator createDropAnimator(final View view, int start, int end) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">       ValueAnimator animator &#x3D; ValueAnimator.ofInt(start, end);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">       animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">           @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">           public void onAnimationUpdate(ValueAnimator animation) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">               int value &#x3D; (int) animation.getAnimatedValue();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">               ViewGroup.LayoutParams layoutParams &#x3D; view.getLayoutParams();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">               layoutParams.height &#x3D; value;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">               view.setLayoutParams(layoutParams);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">           &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">       &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">       return animator;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr></table></figure>
+<p>####4.3 接口请求成功之后执行动画模块；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Message msg &#x3D; mHandler.obtainMessage(FADE_OUT);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">                        mHandler.removeMessages(FADE_OUT);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">                        mHandler.sendMessageDelayed(msg, 1000);</span></pre></td></tr></table></figure>
+<p>#Notice<br>1.其中的FADE_OUT自己定义一个值就行，主要是发送给handler具体操作使用的；<br>2.动画执行的时间间隔，需要多久之后执行在 mHandler.sendMessageDelayed(msg, 1000);<br>中修改后面的数值就行；<br>3.不同的需求可能需要执行动画的View也不同，直接修改animateClose(final TextView view)形参就好</p>
+<p>～～～～～～～～～～～～～完～～～～～～～～～～～～～～～～～</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.windymonkey.cn/2019/11/29/%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C/" data-id="ck3kblbuu0001job7g4381veb" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/11/29/Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Flutter与原生交互总结
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/11/29/Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93/">Flutter与原生交互总结</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/29/%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C/">显示1s自动隐藏的动画效果</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 风一样的猴子<br>
+      Powered by <a href="http://hexo.io/" target="_blank">WindyMonkey</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

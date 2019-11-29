@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Flutter与原生交互总结 | 花果山</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#Flutter学习诀窍，Flutter一切皆组件！ Android与Flutter之间的通信共有四种实现方式。  由于在初始化flutter页面时会传递一个字符串——route，因此我们就可以拿route来做文章，传递自己想要传递的数据。该种方式仅支持单向数据传递且数据类型只能为字符串，无返回值。 通过EventChannel来实现，EventChannel仅支持数据单向传递，无返回值。 通过M">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter与原生交互总结">
+<meta property="og:url" content="http:&#x2F;&#x2F;www.windymonkey.cn&#x2F;2019&#x2F;11&#x2F;29&#x2F;Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93&#x2F;index.html">
+<meta property="og:site_name" content="花果山">
+<meta property="og:description" content="#Flutter学习诀窍，Flutter一切皆组件！ Android与Flutter之间的通信共有四种实现方式。  由于在初始化flutter页面时会传递一个字符串——route，因此我们就可以拿route来做文章，传递自己想要传递的数据。该种方式仅支持单向数据传递且数据类型只能为字符串，无返回值。 通过EventChannel来实现，EventChannel仅支持数据单向传递，无返回值。 通过M">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-29T15:22:38.541Z">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="花果山" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">花果山</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.windymonkey.cn"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Flutter与原生交互总结" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/11/29/Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93/" class="article-date">
+  <time datetime="2019-11-29T15:22:38.415Z" itemprop="datePublished">2019-11-29</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Flutter与原生交互总结
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>#Flutter学习诀窍，Flutter一切皆组件！</p>
+<p>Android与Flutter之间的通信共有四种实现方式。</p>
+<ol>
+<li>由于在初始化flutter页面时会传递一个字符串——route，因此我们就可以拿route来做文章，传递自己想要传递的数据。该种方式仅支持单向数据传递且数据类型只能为字符串，无返回值。</li>
+<li>通过EventChannel来实现，EventChannel仅支持数据单向传递，无返回值。</li>
+<li>通过MethodChannel来实现，MethodChannel支持数据双向传递，有返回值。</li>
+<li>通过BasicMessageChannel来实现，BasicMessageChannel支持数据双向传递，有返回值。<br>#一、先看下初始化的方式<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">FlutterView flutterView &#x3D; Flutter.createView(this, getLifecycle(), &quot;route&quot;);</span></pre></td></tr></table></figure>
+route就是默认的路由字段，这个字段可以是一个JSON对象，这样就可以实现原生传递给Flutter数据，Flutter在自己的路由中心解析这个JSON对象，获取到需要的数据进行处理，初始化页面就ok了。<br>#二、EventChannel<br>原生传递给Flutter数据，这个方式可以避免一中的在路由里面处理数据，Android代码如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">new EventChannel(flutterView, CHANNEL_POST).setStreamHandler(new EventChannel.StreamHandler() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">       @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">       public void onListen(Object o, EventChannel.EventSink eventSink) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">           eventSink.success(&quot;原生传递参数&quot;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">       &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">       @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">       public void onCancel(Object o) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">       &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">   &#125;);</span></pre></td></tr></table></figure>
+<p>其中的CHANNEL_POST，是自己定义的一个协议，和Flutter侧统一就可以，在main.dart中注册该方法就可以，示例代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Application.eventChannel &#x3D; const EventChannel(TTKeys.channel_native_post);</span></pre></td></tr></table></figure>
+<p>参数的获取在路由到的页面中实现，如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">String naviTitle &#x3D; &#39;商品详情&#39;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 回调事件</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">void _onEvent(Object event) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  setState(() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    naviTitle &#x3D; event.toString();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">  &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 错误返回</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">void _onError(Object error) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+<p>#三、MethodChannel<br>该方式可以实现双向通道，Flutter调用原生，原生再返回数据给Flutter，注册的方式和EventChannel类似，Android端的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">MethodChannel channelGet &#x3D; new MethodChannel(flutterView, CHANNEL_GET);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">  channelGet.setMethodCallHandler((call, result) -&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">      result.success(authHeader());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">      switch (call.method) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">          case &quot;router&quot;:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">              String args &#x3D; (String) call.arguments;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">              result.success(&quot;回传给Flutter的参数&quot;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">              break;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">          default:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">              break;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">  &#125;);</span></pre></td></tr></table></figure>
+<p>Flutter端使用一下的方法获取Android回传的数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Application.methodChannel.invokeMethod(&quot;router&quot;)</span></pre></td></tr></table></figure>
+<p>这里的路由字段可以自由定义，能区分开就好。<br>#四、BasicMessageChannel<br>BasicMessageChannel是一种能够在native与flutter之间互相发送消息的通信方式，它支持数据类型最多，使用范围最广。EventChannel与MethodChannel的应用场景可以使用BasicMessageChannel来实现，但BasicMessageChannel的应用场景就不一定能够使用EventChannel与MethodChannel来实现。该方式有返回值。<br>Android端代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">public class BasicMessageChannelPlugin implements BasicMessageChannel.MessageHandler&lt;String&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    private Activity activity;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    private BasicMessageChannel&lt;String&gt; messageChannel;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    static BasicMessageChannelPlugin registerWith(FlutterView flutterView) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">        return new BasicMessageChannelPlugin(flutterView);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    private BasicMessageChannelPlugin(FlutterView flutterView) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">        this.activity &#x3D; (Activity) flutterView.getContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">        this.messageChannel &#x3D; new BasicMessageChannel&lt;String&gt;(flutterView, &quot;BasicMessageChannelPlugin&quot;, StringCodec.INSTANCE);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        messageChannel.setMessageHandler(this);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    @Override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    public void onMessage(String s, BasicMessageChannel.Reply&lt;String&gt; reply) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">        reply.reply(&quot;BasicMessageChannelPlugin收到：&quot; + s);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">        if (activity instanceof FlutterAppActivity) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">            ((FlutterAppActivity) activity).showContent(s);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">    void send(String str, BasicMessageChannel.Reply&lt;String&gt; reply) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">        messageChannel.send(str, reply);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>Flutter端的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"> class _MyHomePageState extends State&lt;MyHomePage&gt; &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">  &#x2F;&#x2F;StringCodec()为编码格式</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  BasicMessageChannel&lt;String&gt; _basicMessageChannel &#x3D;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">      BasicMessageChannel(&quot;BasicMessageChannelPlugin&quot;, StringCodec());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">  @override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">  void initState() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    _basicMessageChannel.setMessageHandler((message) &#x3D;&gt; Future&lt;String&gt;(() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">          print(message);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">          &#x2F;&#x2F;message为native传递的数据</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">          setState(() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">            _content &#x3D; message;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">          &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">          &#x2F;&#x2F;给Android端的返回值</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">          return &quot;收到Native消息：&quot; + message;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">        &#125;));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    _controller &#x3D; TextEditingController();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">    super.initState();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">  &#x2F;&#x2F;向native发送消息</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">  void _sendToNative() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">      Future&lt;String&gt; future &#x3D; _basicMessageChannel.send(_controller.text);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">      future.then((message) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">        _resultContent &#x3D; &quot;返回值：&quot; + message;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">      &#125;);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">  @override</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">  Widget build(BuildContext context) &#123;...&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+<p>原生与Flutter数据交互，主要就是构建好通道机制，可以多尝试不同的数据传递，构建拓展性比较高的路由中心。感谢阅读～</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.windymonkey.cn/2019/11/29/Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93/" data-id="ck3kblbuo0000job77sai2hbg" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/11/29/%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">显示1s自动隐藏的动画效果</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2019/11/29/Flutter%E4%B8%8E%E5%8E%9F%E7%94%9F%E4%BA%A4%E4%BA%92%E6%80%BB%E7%BB%93/">Flutter与原生交互总结</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/29/%E6%98%BE%E7%A4%BA1s%E8%87%AA%E5%8A%A8%E9%9A%90%E8%97%8F%E7%9A%84%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C/">显示1s自动隐藏的动画效果</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 风一样的猴子<br>
+      Powered by <a href="http://hexo.io/" target="_blank">WindyMonkey</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
